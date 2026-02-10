@@ -1,0 +1,24 @@
+-------------------------------------------------------------------------------
+Test set: com.mable.banking.service.TransferProcessorTest$InsufficientBalance
+-------------------------------------------------------------------------------
+Tests run: 2, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 0.002 s <<< FAILURE! -- in com.mable.banking.service.TransferProcessorTest$InsufficientBalance
+com.mable.banking.service.TransferProcessorTest$InsufficientBalance.amountExceedsBalance -- Time elapsed: 0.001 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "com.mable.banking.service.AccountService.hasSufficientBalance(com.mable.banking.domain.Account, java.math.BigDecimal)" because "this.accountService" is null
+	at com.mable.banking.service.TransferProcessor.resolveStatus(TransferProcessor.java:56)
+	at com.mable.banking.service.TransferProcessor.process(TransferProcessor.java:32)
+	at com.mable.banking.service.TransferProcessorTest$InsufficientBalance.amountExceedsBalance(TransferProcessorTest.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:578)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
+com.mable.banking.service.TransferProcessorTest$InsufficientBalance.insufficientBalanceStatus -- Time elapsed: 0.001 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "com.mable.banking.service.AccountService.hasSufficientBalance(com.mable.banking.domain.Account, java.math.BigDecimal)" because "this.accountService" is null
+	at com.mable.banking.service.TransferProcessor.resolveStatus(TransferProcessor.java:56)
+	at com.mable.banking.service.TransferProcessor.process(TransferProcessor.java:32)
+	at com.mable.banking.service.TransferProcessorTest$InsufficientBalance.insufficientBalanceStatus(TransferProcessorTest.java:95)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:578)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+

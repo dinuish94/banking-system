@@ -1,0 +1,13 @@
+-------------------------------------------------------------------------------
+Test set: com.mable.banking.app.BankingIntegrationTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.032 s <<< FAILURE! -- in com.mable.banking.app.BankingIntegrationTest
+com.mable.banking.app.BankingIntegrationTest.exampleFilesProduceCorrectBalances -- Time elapsed: 0.021 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "com.mable.banking.service.AccountService.hasSufficientBalance(com.mable.banking.domain.Account, java.math.BigDecimal)" because "this.accountService" is null
+	at com.mable.banking.service.TransferProcessor.resolveStatus(TransferProcessor.java:56)
+	at com.mable.banking.service.TransferProcessor.process(TransferProcessor.java:32)
+	at com.mable.banking.app.BankingIntegrationTest.exampleFilesProduceCorrectBalances(BankingIntegrationTest.java:32)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:578)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+

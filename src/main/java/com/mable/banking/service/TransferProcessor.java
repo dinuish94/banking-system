@@ -19,6 +19,34 @@ public class TransferProcessor {
     private final AccountService accountService;
 
     public ProcessResult process(Map<String, Account> accounts, List<Transfer> transfers) {
+        validateData(accounts, transfers);
+
+        Map<String, Account> copyOfAccounts = new LinkedHashMap<>();
+        for (Account a : accounts.values()) {
+            copyOfAccounts.put(a.getAccountId(), new Account(a.getAccountId(), a.getBalance()));
+        }
+
+        List<TransactionResult> results = new ArrayList<>();
+
+        for (Transfer transfer : transfers) {
+            performTransaction(transfer, copyOfAccounts, results);
+        }
+        return new ProcessResult(copyOfAccounts, results);
+    }
+
+    private void performTransaction(Transfer transfer, Map<String, Account> copyOfAccounts, List<TransactionResult> results) {
+        TransactionStatus status = resolveStatus(copyOfAccounts, transfer);
+        results.add(TransactionResult.of(transfer, status));
+
+        if (status == TransactionStatus.APPLIED) {
+            Account from = copyOfAccounts.get(transfer.fromAccountId());
+            Account to = copyOfAccounts.get(transfer.toAccountId());
+            accountService.debit(from, transfer.amount());
+            accountService.credit(to, transfer.amount());
+        }
+    }
+
+    private static void validateData(Map<String, Account> accounts, List<Transfer> transfers) {
         if (accounts == null || accounts.isEmpty()) {
             throw new ValidationException("Accounts cannot be null or empty");
         }
@@ -26,26 +54,6 @@ public class TransferProcessor {
         if (transfers == null) {
             throw new ValidationException("Transfers cannot be null");
         }
-
-        Map<String, Account> copy = new LinkedHashMap<>();
-        for (Account a : accounts.values()) {
-            copy.put(a.getAccountId(), new Account(a.getAccountId(), a.getBalance()));
-        }
-
-        List<TransactionResult> results = new ArrayList<>();
-
-        for (Transfer t : transfers) {
-            TransactionStatus status = resolveStatus(copy, t);
-            results.add(TransactionResult.of(t, status));
-
-            if (status == TransactionStatus.APPLIED) {
-                Account from = copy.get(t.fromAccountId());
-                Account to = copy.get(t.toAccountId());
-                accountService.debit(from, t.amount());
-                accountService.credit(to, t.amount());
-            }
-        }
-        return new ProcessResult(copy, results);
     }
 
     private TransactionStatus resolveStatus(Map<String, Account> copy, Transfer t) {

@@ -11,9 +11,6 @@ import com.mable.banking.exception.ValidationException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Tests for Account domain model: construction, validation, and equality.
- */
 class AccountTest {
 
     private static final String VALID_ID = "1111234522226789";

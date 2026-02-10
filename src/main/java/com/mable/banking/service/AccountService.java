@@ -1,7 +1,6 @@
 package com.mable.banking.service;
 
 import com.mable.banking.domain.Account;
-import com.mable.banking.exception.BankingException;
 import com.mable.banking.exception.ValidationException;
 import lombok.NoArgsConstructor;
 

@@ -16,9 +16,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Tests for TransactionCsvReader: parsing CSV and error collection into report.
- */
 class TransactionCsvReaderTest {
 
     private static final String FROM = "1111234522226789";

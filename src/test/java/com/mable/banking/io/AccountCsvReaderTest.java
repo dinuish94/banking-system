@@ -17,9 +17,6 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Tests for AccountCsvReader: parsing CSV, validation, and error collection into report.
- */
 class AccountCsvReaderTest {
 
     @TempDir

@@ -1,7 +1,6 @@
 package com.mable.banking.service;
 
 import com.mable.banking.domain.Account;
-import com.mable.banking.exception.BankingException;
 import com.mable.banking.exception.ValidationException;
 
 import org.junit.jupiter.api.DisplayName;
@@ -12,9 +11,6 @@ import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Tests for AccountService: hasSufficientBalance, debit and credit business rules.
- */
 class AccountServiceTest {
 
     private static final String VALID_ID = "1111234522226789";

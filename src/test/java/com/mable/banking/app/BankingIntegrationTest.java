@@ -14,9 +14,6 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Integration test: loads example files, runs processor, asserts final balances.
- */
 class BankingIntegrationTest {
 
     @Test

@@ -11,9 +11,6 @@ import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Tests for Transfer value object: validation of from, to, and amount.
- */
 class TransferTest {
 
     private static final String FROM = "1111234522226789";

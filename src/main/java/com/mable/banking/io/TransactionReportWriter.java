@@ -1,6 +1,7 @@
 package com.mable.banking.io;
 
 import com.mable.banking.domain.TransactionResult;
+import com.mable.banking.exception.ValidationException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -12,18 +13,18 @@ public class TransactionReportWriter {
 
     public void write(java.nio.file.Path path, List<TransactionResult> results) throws IOException {
         if (path == null) {
-            throw new IllegalArgumentException("Report path cannot be null");
+            throw new ValidationException("Report path cannot be null");
         }
 
         if (results == null) {
-            throw new IllegalArgumentException("Results cannot be null");
+            throw new ValidationException("Results cannot be null");
         }
 
         List<String> lines = new java.util.ArrayList<>();
         lines.add(HEADER);
 
         for (TransactionResult r : results) {
-            lines.add(String.format("%s,%s,%s,%s", r.getFromAccountId(), r.getToAccountId(), r.getAmountDisplay(), r.getStatus()));
+            lines.add(String.format("%s,%s,%s,%s", r.fromAccountId(), r.toAccountId(), r.amountDisplay(), r.status()));
         }
 
         Files.write(path, lines);

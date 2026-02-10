@@ -1,8 +1,9 @@
 package com.mable.banking.io;
 
 import com.mable.banking.domain.Account;
-import com.mable.banking.domain.AccountValidator;
+import com.mable.banking.domain.BalanceLoadResult;
 import com.mable.banking.domain.LineError;
+import com.mable.banking.exception.ValidationException;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -14,11 +15,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static com.mable.banking.service.Validator.validateAccountId;
+import static com.mable.banking.service.Validator.validateBalance;
+
 public class AccountCsvReader {
 
     public BalanceLoadResult load(Path path) throws IOException {
         if (path == null || !Files.isRegularFile(path)) {
-            throw new IllegalArgumentException("Balance file path must be an existing file: " + path);
+            throw new ValidationException("Balance file path must be an existing file: " + path);
         }
 
         Map<String, Account> accounts = new LinkedHashMap<>();
@@ -65,9 +69,13 @@ public class AccountCsvReader {
             return ParseLineResult.error(lineNumber, line, "Invalid balance: " + balanceStr);
         }
         try {
-            Account account = AccountValidator.createAccount(accountId, balance);
+            String validatedAccountId = validateAccountId(accountId);
+            BigDecimal validatedBalance = validateBalance(balance);
+
+            Account account = new Account(validatedAccountId, validatedBalance);
+
             return ParseLineResult.ok(account);
-        } catch (IllegalArgumentException e) {
+        } catch (ValidationException e) {
             return ParseLineResult.error(lineNumber, line, e.getMessage());
         }
     }

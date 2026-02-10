@@ -2,6 +2,7 @@ package com.mable.banking.io;
 
 import com.mable.banking.domain.LineError;
 import com.mable.banking.domain.Transfer;
+import com.mable.banking.exception.ValidationException;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -10,11 +11,14 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.mable.banking.service.Validator.validateAccountId;
+import static com.mable.banking.service.Validator.validateTransferAmount;
+
 public class TransactionCsvReader {
 
     public TransactionLoadResult load(Path path) throws IOException {
         if (path == null || !Files.isRegularFile(path)) {
-            throw new IllegalArgumentException("Transfer file path must be an existing file: " + path);
+            throw new ValidationException("Transfer file path must be an existing file: " + path);
         }
 
         List<String> lines = Files.readAllLines(path);
@@ -55,9 +59,13 @@ public class TransactionCsvReader {
         }
 
         try {
-            Transfer transfer = new Transfer(from, to, amount);
+            String validatedFrom = validateAccountId(from, "from");
+            String validatedTo = validateAccountId(to, "to");
+            BigDecimal validatedAmount = validateTransferAmount(amount);
+
+            Transfer transfer = new Transfer(validatedFrom, validatedTo, validatedAmount);
             return ParseLineResult.ok(transfer);
-        } catch (IllegalArgumentException e) {
+        } catch (ValidationException e) {
             return ParseLineResult.error(lineNumber, line, e.getMessage());
         }
     }

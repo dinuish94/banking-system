@@ -1,6 +1,8 @@
 package com.mable.banking.service;
 
 import com.mable.banking.domain.Account;
+import com.mable.banking.exception.BankingException;
+import com.mable.banking.exception.ValidationException;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -77,7 +79,7 @@ class AccountServiceTest {
         @DisplayName("debit throws when insufficient balance")
         void debitThrowsWhenInsufficient() {
             Account a = new Account(VALID_ID, new BigDecimal("100.00"));
-            assertThrows(IllegalStateException.class,
+            assertThrows(BankingException.class,
                 () -> accountService.debit(a, new BigDecimal("100.01")));
             assertEquals(new BigDecimal("100.00"), a.getBalance());
         }
@@ -86,18 +88,18 @@ class AccountServiceTest {
         @DisplayName("debit throws for null or non-positive amount")
         void debitValidatesAmount() {
             Account a = new Account(VALID_ID, new BigDecimal("100.00"));
-            assertThrows(IllegalArgumentException.class, () -> accountService.debit(a, null));
-            assertThrows(IllegalArgumentException.class, () -> accountService.debit(a, BigDecimal.ZERO));
-            assertThrows(IllegalArgumentException.class, () -> accountService.debit(a, new BigDecimal("-1")));
+            assertThrows(ValidationException.class, () -> accountService.debit(a, null));
+            assertThrows(ValidationException.class, () -> accountService.debit(a, BigDecimal.ZERO));
+            assertThrows(ValidationException.class, () -> accountService.debit(a, new BigDecimal("-1")));
         }
 
         @Test
         @DisplayName("credit throws for null or non-positive amount")
         void creditValidatesAmount() {
             Account a = new Account(VALID_ID, new BigDecimal("100.00"));
-            assertThrows(IllegalArgumentException.class, () -> accountService.credit(a, null));
-            assertThrows(IllegalArgumentException.class, () -> accountService.credit(a, BigDecimal.ZERO));
-            assertThrows(IllegalArgumentException.class, () -> accountService.credit(a, new BigDecimal("-1")));
+            assertThrows(ValidationException.class, () -> accountService.credit(a, null));
+            assertThrows(ValidationException.class, () -> accountService.credit(a, BigDecimal.ZERO));
+            assertThrows(ValidationException.class, () -> accountService.credit(a, new BigDecimal("-1")));
         }
     }
 }

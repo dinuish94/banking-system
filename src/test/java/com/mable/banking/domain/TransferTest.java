@@ -1,8 +1,11 @@
 package com.mable.banking.domain;
 
+import com.mable.banking.service.Validator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
+import com.mable.banking.exception.ValidationException;
 
 import java.math.BigDecimal;
 
@@ -23,18 +26,24 @@ class TransferTest {
         @Test
         @DisplayName("accepts valid from, to, and positive amount")
         void validTransfer() {
-            Transfer t = new Transfer(FROM, TO, new BigDecimal("500.00"));
-            assertEquals(FROM, t.getFromAccountId());
-            assertEquals(TO, t.getToAccountId());
-            assertEquals(new BigDecimal("500.00"), t.getAmount());
+            Transfer t = new Transfer(
+                Validator.validateAccountId(FROM, "from"),
+                Validator.validateAccountId(TO, "to"),
+                Validator.validateTransferAmount(new BigDecimal("500.00")));
+            assertEquals(FROM, t.fromAccountId());
+            assertEquals(TO, t.toAccountId());
+            assertEquals(new BigDecimal("500.00"), t.amount());
         }
 
         @Test
         @DisplayName("trims whitespace from account ids")
         void trimsIds() {
-            Transfer t = new Transfer("  " + FROM + "  ", "  " + TO + "  ", new BigDecimal("1.00"));
-            assertEquals(FROM, t.getFromAccountId());
-            assertEquals(TO, t.getToAccountId());
+            Transfer t = new Transfer(
+                Validator.validateAccountId("  " + FROM + "  ", "from"),
+                Validator.validateAccountId("  " + TO + "  ", "to"),
+                Validator.validateTransferAmount(new BigDecimal("1.00")));
+            assertEquals(FROM, t.fromAccountId());
+            assertEquals(TO, t.toAccountId());
         }
     }
 
@@ -45,22 +54,22 @@ class TransferTest {
         @Test
         @DisplayName("rejects null from account")
         void rejectsNullFrom() {
-            assertThrows(IllegalArgumentException.class,
-                () -> new Transfer(null, TO, new BigDecimal("100")));
+            assertThrows(ValidationException.class,
+                () -> Validator.validateAccountId(null, "from"));
         }
 
         @Test
         @DisplayName("rejects blank from account")
         void rejectsBlankFrom() {
-            assertThrows(IllegalArgumentException.class,
-                () -> new Transfer("  ", TO, new BigDecimal("100")));
+            assertThrows(ValidationException.class,
+                () -> Validator.validateAccountId("  ", "from"));
         }
 
         @Test
         @DisplayName("rejects from account not 16 digits")
         void rejectsInvalidFromLength() {
-            assertThrows(IllegalArgumentException.class,
-                () -> new Transfer("123", TO, new BigDecimal("100")));
+            assertThrows(ValidationException.class,
+                () -> Validator.validateAccountId("123", "from"));
         }
     }
 
@@ -71,15 +80,15 @@ class TransferTest {
         @Test
         @DisplayName("rejects null to account")
         void rejectsNullTo() {
-            assertThrows(IllegalArgumentException.class,
-                () -> new Transfer(FROM, null, new BigDecimal("100")));
+            assertThrows(ValidationException.class,
+                () -> Validator.validateAccountId(null, "to"));
         }
 
         @Test
         @DisplayName("rejects to account not 16 digits")
         void rejectsInvalidToLength() {
-            assertThrows(IllegalArgumentException.class,
-                () -> new Transfer(FROM, "abc", new BigDecimal("100")));
+            assertThrows(ValidationException.class,
+                () -> Validator.validateAccountId("abc", "to"));
         }
     }
 
@@ -90,31 +99,34 @@ class TransferTest {
         @Test
         @DisplayName("rejects null amount")
         void rejectsNullAmount() {
-            assertThrows(IllegalArgumentException.class,
-                () -> new Transfer(FROM, TO, null));
+            assertThrows(ValidationException.class,
+                () -> Validator.validateTransferAmount(null));
         }
 
         @Test
         @DisplayName("rejects zero amount")
         void rejectsZeroAmount() {
-            assertThrows(IllegalArgumentException.class,
-                () -> new Transfer(FROM, TO, BigDecimal.ZERO));
+            assertThrows(ValidationException.class,
+                () -> Validator.validateTransferAmount(BigDecimal.ZERO));
         }
 
         @Test
         @DisplayName("rejects negative amount")
         void rejectsNegativeAmount() {
-            assertThrows(IllegalArgumentException.class,
-                () -> new Transfer(FROM, TO, new BigDecimal("-1")));
+            assertThrows(ValidationException.class,
+                () -> Validator.validateTransferAmount(new BigDecimal("-1")));
         }
     }
 
     @Test
     @DisplayName("accepts same from and to account (processor assigns SAME_ACCOUNT status)")
     void acceptsSameFromAndTo() {
-        Transfer t = new Transfer(FROM, FROM, new BigDecimal("100"));
-        assertEquals(FROM, t.getFromAccountId());
-        assertEquals(FROM, t.getToAccountId());
+        Transfer t = new Transfer(
+            Validator.validateAccountId(FROM, "from"),
+            Validator.validateAccountId(FROM, "to"),
+            Validator.validateTransferAmount(new BigDecimal("100")));
+        assertEquals(FROM, t.fromAccountId());
+        assertEquals(FROM, t.toAccountId());
     }
 
     @Nested

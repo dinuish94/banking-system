@@ -1,6 +1,7 @@
 package com.mable.banking.io;
 
 import com.mable.banking.domain.LineError;
+import com.mable.banking.exception.ValidationException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,7 +15,7 @@ public class ErrorReportWriter {
 
     public void write(java.nio.file.Path path, List<LineError> errors) throws IOException {
         if (path == null) {
-            throw new IllegalArgumentException("Report path cannot be null");
+            throw new ValidationException("Report path cannot be null");
         }
 
         if (isEmpty(errors)) {

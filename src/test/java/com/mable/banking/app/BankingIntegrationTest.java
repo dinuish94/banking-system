@@ -22,8 +22,8 @@ class BankingIntegrationTest {
     @Test
     @DisplayName("example files produce correct final balances")
     void exampleFilesProduceCorrectBalances() throws Exception {
-        Path balancePath = Path.of("mable_account_balances.csv");
-        Path transferPath = Path.of("mable_transactions.csv");
+        Path balancePath = Path.of("src/main/resources/input/mable_account_balances.csv");
+        Path transferPath = Path.of("src/main/resources/input/mable_transactions.csv");
         if (!balancePath.toFile().exists() || !transferPath.toFile().exists()) {
             return;
         }
@@ -32,15 +32,15 @@ class BankingIntegrationTest {
         var transactionResult = new TransactionCsvReader().load(transferPath);
         var result = new TransferProcessor(new AccountService()).process(balanceResult.accounts(), transactionResult.transfers());
 
-        long nonApplied = result.getTransactionResults().stream()
-            .filter(r -> r.getStatus() != TransactionStatus.APPLIED)
+        long nonApplied = result.transactionResults().stream()
+            .filter(r -> r.status() != TransactionStatus.APPLIED)
             .count();
         assertEquals(0, nonApplied);
 
-        assertEquals(new BigDecimal("4820.50"), result.getAccounts().get("1111234522226789").getBalance());
-        assertEquals(new BigDecimal("9974.40"), result.getAccounts().get("1111234522221234").getBalance());
-        assertEquals(new BigDecimal("1550.00"), result.getAccounts().get("2222123433331212").getBalance());
-        assertEquals(new BigDecimal("1725.60"), result.getAccounts().get("1212343433335665").getBalance());
-        assertEquals(new BigDecimal("48679.50"), result.getAccounts().get("3212343433335755").getBalance());
+        assertEquals(new BigDecimal("4820.50"), result.accounts().get("1111234522226789").getBalance());
+        assertEquals(new BigDecimal("9974.40"), result.accounts().get("1111234522221234").getBalance());
+        assertEquals(new BigDecimal("1550.00"), result.accounts().get("2222123433331212").getBalance());
+        assertEquals(new BigDecimal("1725.60"), result.accounts().get("1212343433335665").getBalance());
+        assertEquals(new BigDecimal("48679.50"), result.accounts().get("3212343433335755").getBalance());
     }
 }

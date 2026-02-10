@@ -1,10 +1,13 @@
 package com.mable.banking.domain;
 
+import com.mable.banking.service.Validator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+
+import com.mable.banking.exception.ValidationException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,54 +33,54 @@ class AccountTest {
         @Test
         @DisplayName("trims whitespace from account id")
         void trimsAccountId() {
-            Account a = AccountValidator.createAccount("  " + VALID_ID + "  ", new BigDecimal("0"));
+            Account a = new Account(Validator.validateAccountId("  " + VALID_ID + "  "), Validator.validateBalance(new BigDecimal("0")));
             assertEquals(VALID_ID, a.getAccountId());
         }
 
         @Test
         @DisplayName("rejects null account id")
         void rejectsNullAccountId() {
-            assertThrows(IllegalArgumentException.class,
-                () -> AccountValidator.createAccount(null, new BigDecimal("100")));
+            assertThrows(ValidationException.class,
+                () -> Validator.validateAccountId(null));
         }
 
         @Test
         @DisplayName("rejects blank account id")
         void rejectsBlankAccountId() {
-            assertThrows(IllegalArgumentException.class,
-                () -> AccountValidator.createAccount("   ", new BigDecimal("100")));
+            assertThrows(ValidationException.class,
+                () -> Validator.validateAccountId("   "));
         }
 
         @Test
         @DisplayName("rejects account id not exactly 16 digits")
         void rejectsInvalidLengthId() {
-            assertThrows(IllegalArgumentException.class,
-                () -> AccountValidator.createAccount("123456789012345", new BigDecimal("100")));
-            assertThrows(IllegalArgumentException.class,
-                () -> AccountValidator.createAccount("12345678901234567", new BigDecimal("100")));
-            assertThrows(IllegalArgumentException.class,
-                () -> AccountValidator.createAccount("12345678901234ab", new BigDecimal("100")));
+            assertThrows(ValidationException.class,
+                () -> Validator.validateAccountId("123456789012345"));
+            assertThrows(ValidationException.class,
+                () -> Validator.validateAccountId("12345678901234567"));
+            assertThrows(ValidationException.class,
+                () -> Validator.validateAccountId("12345678901234ab"));
         }
 
         @Test
         @DisplayName("rejects null balance")
         void rejectsNullBalance() {
-            assertThrows(IllegalArgumentException.class,
-                () -> AccountValidator.createAccount(VALID_ID, null));
+            assertThrows(ValidationException.class,
+                () -> Validator.validateBalance(null));
         }
 
         @Test
         @DisplayName("rejects negative balance")
         void rejectsNegativeBalance() {
-            assertThrows(IllegalArgumentException.class,
-                () -> AccountValidator.createAccount(VALID_ID, new BigDecimal("-1")));
+            assertThrows(ValidationException.class,
+                () -> Validator.validateBalance(new BigDecimal("-1")));
         }
 
         @Test
         @DisplayName("normalises balance to 2 decimal places where no rounding needed")
         void twoDecimalPlaces() {
-            Account a = AccountValidator.createAccount(VALID_ID, new BigDecimal("5000.00"));
-            assertEquals(2, a.getBalance().scale());
+            BigDecimal balance = Validator.validateBalance(new BigDecimal("5000.00"));
+            assertEquals(2, balance.scale());
         }
     }
 
@@ -86,8 +89,17 @@ class AccountTest {
     class Equality {
 
         @Test
-        @DisplayName("equality based on account id only")
-        void equalityByAccountId() {
+        @DisplayName("equal when same account id and balance")
+        void equalWhenSameComponents() {
+            Account a1 = new Account(VALID_ID, new BigDecimal("100"));
+            Account a2 = new Account(VALID_ID, new BigDecimal("100"));
+            assertEquals(a1, a2);
+            assertEquals(a1.hashCode(), a2.hashCode());
+        }
+
+        @Test
+        @DisplayName("equal when same account id (identity by id; balance is mutable)")
+        void equalWhenSameAccountId() {
             Account a1 = new Account(VALID_ID, new BigDecimal("100"));
             Account a2 = new Account(VALID_ID, new BigDecimal("200"));
             assertEquals(a1, a2);

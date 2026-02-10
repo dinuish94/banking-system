@@ -1,6 +1,7 @@
 package com.mable.banking.io;
 
 import com.mable.banking.domain.Transfer;
+import com.mable.banking.exception.ValidationException;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -39,9 +40,9 @@ class TransactionCsvReaderTest {
             assertFalse(result.hasErrors());
             List<Transfer> transfers = result.transfers();
             assertEquals(2, transfers.size());
-            assertEquals(FROM, transfers.get(0).getFromAccountId());
-            assertEquals(TO, transfers.get(0).getToAccountId());
-            assertEquals(new BigDecimal("500.00"), transfers.get(0).getAmount());
+            assertEquals(FROM, transfers.get(0).fromAccountId());
+            assertEquals(TO, transfers.get(0).toAccountId());
+            assertEquals(new BigDecimal("500.00"), transfers.get(0).amount());
         }
 
         @Test
@@ -94,8 +95,8 @@ class TransactionCsvReaderTest {
     @Test
     @DisplayName("throws when path is null or not a file")
     void invalidPath() {
-        assertThrows(IllegalArgumentException.class, () -> new TransactionCsvReader().load((Path) null));
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(ValidationException.class, () -> new TransactionCsvReader().load((Path) null));
+        assertThrows(ValidationException.class,
             () -> new TransactionCsvReader().load(tempDir.resolve("nonexistent.csv")));
     }
 

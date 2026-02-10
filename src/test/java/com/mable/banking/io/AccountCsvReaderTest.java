@@ -1,6 +1,8 @@
 package com.mable.banking.io;
 
 import com.mable.banking.domain.Account;
+import com.mable.banking.domain.BalanceLoadResult;
+import com.mable.banking.exception.ValidationException;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -121,8 +123,8 @@ class AccountCsvReaderTest {
         @Test
         @DisplayName("throws when path is null or not a file")
         void invalidPath() {
-            assertThrows(IllegalArgumentException.class, () -> new AccountCsvReader().load((Path) null));
-            assertThrows(IllegalArgumentException.class,
+            assertThrows(ValidationException.class, () -> new AccountCsvReader().load((Path) null));
+            assertThrows(ValidationException.class,
                 () -> new AccountCsvReader().load(tempDir.resolve("nonexistent.csv")));
         }
     }

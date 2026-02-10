@@ -2,6 +2,7 @@ package com.mable.banking.service;
 
 import com.mable.banking.domain.Account;
 import com.mable.banking.domain.ProcessResult;
+import com.mable.banking.exception.ValidationException;
 import com.mable.banking.domain.TransactionResult;
 import com.mable.banking.domain.TransactionStatus;
 import com.mable.banking.domain.Transfer;
@@ -16,9 +17,6 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Tests for TransferProcessor: applying transfers and status for business rules (no exceptions).
- */
 class TransferProcessorTest {
 
     private Map<String, Account> accounts;
@@ -39,8 +37,8 @@ class TransferProcessorTest {
     }
 
     private static List<TransactionResult> nonApplied(ProcessResult result) {
-        return result.getTransactionResults().stream()
-            .filter(r -> r.getStatus() != TransactionStatus.APPLIED)
+        return result.transactionResults().stream()
+            .filter(r -> r.status() != TransactionStatus.APPLIED)
             .toList();
     }
 
@@ -54,9 +52,9 @@ class TransferProcessorTest {
             var result = processor.process(accounts, List.of(
                 new Transfer(ACC_A, ACC_B, new BigDecimal("500.00"))));
             assertEquals(0, nonApplied(result).size());
-            assertEquals(TransactionStatus.APPLIED, result.getTransactionResults().get(0).getStatus());
-            assertEquals(new BigDecimal("4500.00"), result.getAccounts().get(ACC_A).getBalance());
-            assertEquals(new BigDecimal("1700.00"), result.getAccounts().get(ACC_B).getBalance());
+            assertEquals(TransactionStatus.APPLIED, result.transactionResults().get(0).status());
+            assertEquals(new BigDecimal("4500.00"), result.accounts().get(ACC_A).getBalance());
+            assertEquals(new BigDecimal("1700.00"), result.accounts().get(ACC_B).getBalance());
         }
 
         @Test
@@ -66,17 +64,17 @@ class TransferProcessorTest {
                 new Transfer(ACC_A, ACC_B, new BigDecimal("500.00")),
                 new Transfer(ACC_C, ACC_A, new BigDecimal("320.50"))));
             assertEquals(0, nonApplied(result).size());
-            assertEquals(new BigDecimal("4820.50"), result.getAccounts().get(ACC_A).getBalance());
-            assertEquals(new BigDecimal("1700.00"), result.getAccounts().get(ACC_B).getBalance());
-            assertEquals(new BigDecimal("49679.50"), result.getAccounts().get(ACC_C).getBalance());
+            assertEquals(new BigDecimal("4820.50"), result.accounts().get(ACC_A).getBalance());
+            assertEquals(new BigDecimal("1700.00"), result.accounts().get(ACC_B).getBalance());
+            assertEquals(new BigDecimal("49679.50"), result.accounts().get(ACC_C).getBalance());
         }
 
         @Test
         @DisplayName("empty transfer list leaves all balances unchanged")
         void emptyTransfers() {
             var result = processor.process(accounts, List.of());
-            assertEquals(0, result.getTransactionResults().size());
-            assertEquals(new BigDecimal("5000.00"), result.getAccounts().get(ACC_A).getBalance());
+            assertEquals(0, result.transactionResults().size());
+            assertEquals(new BigDecimal("5000.00"), result.accounts().get(ACC_A).getBalance());
         }
 
         @Test
@@ -98,7 +96,7 @@ class TransferProcessorTest {
             var result = processor.process(accounts, List.of(
                 new Transfer(ACC_A, ACC_B, new BigDecimal("10000.00"))));
             assertEquals(1, nonApplied(result).size());
-            assertEquals(TransactionStatus.INSUFFICIENT_BALANCE, result.getTransactionResults().get(0).getStatus());
+            assertEquals(TransactionStatus.INSUFFICIENT_BALANCE, result.transactionResults().get(0).status());
         }
 
         @Test
@@ -107,7 +105,7 @@ class TransferProcessorTest {
             var result = processor.process(accounts, List.of(
                 new Transfer(ACC_B, ACC_A, new BigDecimal("1200.01"))));
             assertEquals(1, nonApplied(result).size());
-            assertEquals(TransactionStatus.INSUFFICIENT_BALANCE, result.getTransactionResults().get(0).getStatus());
+            assertEquals(TransactionStatus.INSUFFICIENT_BALANCE, result.transactionResults().get(0).status());
         }
     }
 
@@ -121,7 +119,7 @@ class TransferProcessorTest {
             var result = processor.process(accounts, List.of(
                 new Transfer("9999999999999999", ACC_B, new BigDecimal("100"))));
             assertEquals(1, nonApplied(result).size());
-            assertEquals(TransactionStatus.UNKNOWN_FROM_ACCOUNT, result.getTransactionResults().get(0).getStatus());
+            assertEquals(TransactionStatus.UNKNOWN_FROM_ACCOUNT, result.transactionResults().get(0).status());
         }
 
         @Test
@@ -130,7 +128,7 @@ class TransferProcessorTest {
             var result = processor.process(accounts, List.of(
                 new Transfer(ACC_A, "9999999999999999", new BigDecimal("100"))));
             assertEquals(1, nonApplied(result).size());
-            assertEquals(TransactionStatus.UNKNOWN_TO_ACCOUNT, result.getTransactionResults().get(0).getStatus());
+            assertEquals(TransactionStatus.UNKNOWN_TO_ACCOUNT, result.transactionResults().get(0).status());
         }
 
         @Test
@@ -139,9 +137,9 @@ class TransferProcessorTest {
             var result = processor.process(accounts, List.of(
                 new Transfer("9999999999999999", ACC_B, new BigDecimal("100")),
                 new Transfer(ACC_A, ACC_B, new BigDecimal("200.00"))));
-            assertEquals(2, result.getTransactionResults().size());
-            assertEquals(TransactionStatus.UNKNOWN_FROM_ACCOUNT, result.getTransactionResults().get(0).getStatus());
-            assertEquals(TransactionStatus.APPLIED, result.getTransactionResults().get(1).getStatus());
+            assertEquals(2, result.transactionResults().size());
+            assertEquals(TransactionStatus.UNKNOWN_FROM_ACCOUNT, result.transactionResults().get(0).status());
+            assertEquals(TransactionStatus.APPLIED, result.transactionResults().get(1).status());
         }
     }
 
@@ -155,7 +153,7 @@ class TransferProcessorTest {
             var result = processor.process(accounts, List.of(
                 new Transfer(ACC_A, ACC_A, new BigDecimal("100"))));
             assertEquals(1, nonApplied(result).size());
-            assertEquals(TransactionStatus.SAME_ACCOUNT, result.getTransactionResults().get(0).getStatus());
+            assertEquals(TransactionStatus.SAME_ACCOUNT, result.transactionResults().get(0).status());
         }
     }
 
@@ -166,16 +164,16 @@ class TransferProcessorTest {
         @Test
         @DisplayName("throws when accounts null or empty")
         void invalidAccounts() {
-            assertThrows(IllegalArgumentException.class,
+            assertThrows(ValidationException.class,
                 () -> processor.process(null, List.of()));
-            assertThrows(IllegalArgumentException.class,
+            assertThrows(ValidationException.class,
                 () -> processor.process(Map.of(), List.of()));
         }
 
         @Test
         @DisplayName("throws when transfers null")
         void nullTransfers() {
-            assertThrows(IllegalArgumentException.class,
+            assertThrows(ValidationException.class,
                 () -> processor.process(accounts, null));
         }
     }

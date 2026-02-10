@@ -1,7 +1,4 @@
-package com.mable.banking.io;
-
-import com.mable.banking.domain.Account;
-import com.mable.banking.domain.LineError;
+package com.mable.banking.domain;
 
 import java.util.List;
 import java.util.Map;

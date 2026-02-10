@@ -79,7 +79,7 @@ class AccountServiceTest {
         @DisplayName("debit throws when insufficient balance")
         void debitThrowsWhenInsufficient() {
             Account a = new Account(VALID_ID, new BigDecimal("100.00"));
-            assertThrows(BankingException.class,
+            assertThrows(ValidationException.class,
                 () -> accountService.debit(a, new BigDecimal("100.01")));
             assertEquals(new BigDecimal("100.00"), a.getBalance());
         }

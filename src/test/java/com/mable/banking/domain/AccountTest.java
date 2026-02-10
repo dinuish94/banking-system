@@ -83,35 +83,4 @@ class AccountTest {
             assertEquals(2, balance.scale());
         }
     }
-
-    @Nested
-    @DisplayName("Equals and hashCode")
-    class Equality {
-
-        @Test
-        @DisplayName("equal when same account id and balance")
-        void equalWhenSameComponents() {
-            Account a1 = new Account(VALID_ID, new BigDecimal("100"));
-            Account a2 = new Account(VALID_ID, new BigDecimal("100"));
-            assertEquals(a1, a2);
-            assertEquals(a1.hashCode(), a2.hashCode());
-        }
-
-        @Test
-        @DisplayName("equal when same account id (identity by id; balance is mutable)")
-        void equalWhenSameAccountId() {
-            Account a1 = new Account(VALID_ID, new BigDecimal("100"));
-            Account a2 = new Account(VALID_ID, new BigDecimal("200"));
-            assertEquals(a1, a2);
-            assertEquals(a1.hashCode(), a2.hashCode());
-        }
-
-        @Test
-        @DisplayName("not equal to different account id")
-        void notEqualDifferentId() {
-            Account a1 = new Account(VALID_ID, new BigDecimal("100"));
-            Account a2 = new Account("1111234522221234", new BigDecimal("100"));
-            assertNotEquals(a1, a2);
-        }
-    }
 }

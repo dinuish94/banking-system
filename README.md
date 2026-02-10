@@ -4,7 +4,7 @@ A simple Java application that loads account balances for a company from a CSV f
 
 ## Build and run
 
-**Requirements:** Java 17+, Maven 3.6+
+**Requirements:** Java 25+, Maven 3.6+
 
 ```bash
 # Build and run tests

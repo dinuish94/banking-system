@@ -3,9 +3,11 @@ package com.mable.banking.service;
 import com.mable.banking.domain.Account;
 import com.mable.banking.exception.ValidationException;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 
+@Slf4j
 @NoArgsConstructor
 public class AccountService {
 
@@ -18,6 +20,7 @@ public class AccountService {
             throw new ValidationException("Insufficient balance for debit");
         }
         account.setBalance(account.getBalance().subtract(amount));
+        log.info("Debited {} from account {}", amount, account.getAccountId());
     }
 
     public void credit(Account account, BigDecimal amount) {
@@ -25,6 +28,7 @@ public class AccountService {
             throw new ValidationException("Credit amount must be positive");
         }
         account.setBalance(account.getBalance().add(amount));
+        log.info("Credited {} to account {}", amount, account.getAccountId());
     }
 
     private static boolean isAmountNegative(BigDecimal amount) {

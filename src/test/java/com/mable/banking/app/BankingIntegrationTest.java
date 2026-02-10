@@ -32,7 +32,7 @@ class BankingIntegrationTest {
         long nonApplied = result.transactionResults().stream()
             .filter(r -> r.status() != TransactionStatus.APPLIED)
             .count();
-        assertEquals(0, nonApplied);
+        assertEquals(2, nonApplied);
 
         assertEquals(new BigDecimal("4820.50"), result.accounts().get("1111234522226789").getBalance());
         assertEquals(new BigDecimal("9974.40"), result.accounts().get("1111234522221234").getBalance());

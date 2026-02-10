@@ -2,6 +2,7 @@ package com.mable.banking.io;
 
 import com.mable.banking.domain.LineError;
 import com.mable.banking.exception.ValidationException;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -9,6 +10,7 @@ import java.util.List;
 
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
+@Slf4j
 public class ErrorReportWriter {
 
     private static final String HEADER = "Line Number,Line,Error";
@@ -22,6 +24,7 @@ public class ErrorReportWriter {
             return;
         }
 
+        log.info("Writing {} error lines to {}", errors.size(), path);
         List<String> lines = new java.util.ArrayList<>();
         lines.add(HEADER);
 

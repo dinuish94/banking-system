@@ -2,11 +2,13 @@ package com.mable.banking.io;
 
 import com.mable.banking.domain.TransactionResult;
 import com.mable.banking.exception.ValidationException;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 
+@Slf4j
 public class TransactionReportWriter {
 
     private static final String HEADER = "From Account,To Account,Amount,Status";
@@ -28,5 +30,6 @@ public class TransactionReportWriter {
         }
 
         Files.write(path, lines);
+        log.info("Wrote {} transaction results to {}", results.size(), path);
     }
 }

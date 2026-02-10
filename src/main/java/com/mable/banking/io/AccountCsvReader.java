@@ -4,6 +4,7 @@ import com.mable.banking.domain.Account;
 import com.mable.banking.domain.BalanceLoadResult;
 import com.mable.banking.domain.LineError;
 import com.mable.banking.exception.ValidationException;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -18,12 +19,14 @@ import java.util.stream.Stream;
 import static com.mable.banking.service.Validator.validateAccountId;
 import static com.mable.banking.service.Validator.validateBalance;
 
+@Slf4j
 public class AccountCsvReader {
 
     public BalanceLoadResult load(Path path) throws IOException {
         if (path == null || !Files.isRegularFile(path)) {
             throw new ValidationException("Balance file path must be an existing file: " + path);
         }
+        log.info("Loading balances from {}", path);
 
         Map<String, Account> accounts = new LinkedHashMap<>();
         List<LineError> errors = new ArrayList<>();
@@ -36,6 +39,7 @@ public class AccountCsvReader {
                 parseAccountBalance(line, lineNumber, errors, accounts);
             }
         }
+        log.info("Loaded {} accounts, {} errors from balance file", accounts.size(), errors.size());
         return new BalanceLoadResult(accounts, errors);
     }
 

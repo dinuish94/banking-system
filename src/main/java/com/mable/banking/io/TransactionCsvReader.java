@@ -3,6 +3,7 @@ package com.mable.banking.io;
 import com.mable.banking.domain.LineError;
 import com.mable.banking.domain.Transfer;
 import com.mable.banking.exception.ValidationException;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -14,12 +15,14 @@ import java.util.List;
 import static com.mable.banking.service.Validator.validateAccountId;
 import static com.mable.banking.service.Validator.validateTransferAmount;
 
+@Slf4j
 public class TransactionCsvReader {
 
     public TransactionLoadResult load(Path path) throws IOException {
         if (path == null || !Files.isRegularFile(path)) {
             throw new ValidationException("Transfer file path must be an existing file: " + path);
         }
+        log.info("Loading transfers from {}", path);
 
         List<String> lines = Files.readAllLines(path);
         List<Transfer> transfers = new ArrayList<>();
@@ -39,6 +42,7 @@ public class TransactionCsvReader {
             transfers.add(parsed.transfer);
         }
 
+        log.info("Loaded {} transfers, {} parse errors from transfer file", transfers.size(), errors.size());
         return new TransactionLoadResult(transfers, errors);
     }
 

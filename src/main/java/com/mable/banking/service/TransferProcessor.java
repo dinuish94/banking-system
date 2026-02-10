@@ -7,12 +7,14 @@ import com.mable.banking.domain.TransactionStatus;
 import com.mable.banking.domain.Transfer;
 import com.mable.banking.exception.ValidationException;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @AllArgsConstructor
 public class TransferProcessor {
 
@@ -20,6 +22,7 @@ public class TransferProcessor {
 
     public ProcessResult process(Map<String, Account> accounts, List<Transfer> transfers) {
         validateData(accounts, transfers);
+        log.info("Processing {} transfers across {} accounts", transfers.size(), accounts.size());
 
         Map<String, Account> copyOfAccounts = new LinkedHashMap<>();
         for (Account a : accounts.values()) {
@@ -31,6 +34,8 @@ public class TransferProcessor {
         for (Transfer transfer : transfers) {
             performTransaction(transfer, copyOfAccounts, results);
         }
+        long applied = results.stream().filter(r -> r.status() == TransactionStatus.APPLIED).count();
+        log.info("Processed {} transfers: {} applied", results.size(), applied);
         return new ProcessResult(copyOfAccounts, results);
     }
 
@@ -43,6 +48,7 @@ public class TransferProcessor {
             Account to = copyOfAccounts.get(transfer.toAccountId());
             accountService.debit(from, transfer.amount());
             accountService.credit(to, transfer.amount());
+            log.info("Transfer processed: {} -> {} amount: {}", transfer.fromAccountId(), transfer.toAccountId(), transfer.amount());
         }
     }
 

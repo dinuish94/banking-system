@@ -4,20 +4,20 @@ A simple Java application that loads account balances for a company from a CSV f
 
 ## Build and run
 
-**Requirements:** Java 25+, Maven 3.6+
+**Requirements:** Java 17+, Maven 3.6+
 
 ```bash
 # Build and run tests
 mvn clean test
 
 # Run the application (from project root; uses input from src/main/resources/input, writes to output/)
-mvn exec:java -q
+mvn exec:java
 ```
 
 With custom paths:
 
 ```bash
-mvn exec:java -q -Dexec.args="path/to/balances.csv path/to/transfers.csv [report.csv] [balance_errors.csv] [transaction_errors.csv]"
+mvn exec:java -Dexec.args="path/to/balances.csv path/to/transfers.csv [report.csv] [balance_errors.csv] [transaction_errors.csv]"
 ```
 
 Or after building:
